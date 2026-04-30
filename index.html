@@ -97,7 +97,7 @@
 </div>
 
 <script>
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby7dbEPoxfHo-WEFMvTHADy4NYe72NiRm0lFbuUsabdLCT4UZEqEa6uFt02bLvGJXTk2A/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyxbT4ayoKEbQiPBH3h2GRm7nhZ5lHra_082QDACBXiCU7d_fFKmiRZoBS5RpQwdXIbJg/exec';
   let memberCount = 0;
 
   function addMember() {
@@ -191,7 +191,6 @@
     btn.disabled = true;
     btn.textContent = 'Envoi en cours...';
 
-    // Envoi via no-cors pour contourner le CORS de Google Apps Script
     const formData = new FormData();
     formData.append('eventName', name);
     formData.append('eventDate', date);
