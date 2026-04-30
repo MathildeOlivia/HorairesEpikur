@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Epikur — Déclaration des heures</title>
+  <style>
+    #epikur-form * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    #epikur-form { max-width: 680px; margin: 0 auto; padding: 2rem 1rem; background: #f4f6f8; min-height: 100vh; color: #1a1a1a; }
+    #epikur-form header { text-align: center; margin-bottom: 2rem; }
+    #epikur-form header h1 { font-size: 22px; font-weight: 600; color: #385560; margin-bottom: 4px; display: block; }
+    #epikur-form header p { font-size: 14px; color: #666; display: block; }
+    #epikur-form .epi-card { background: #fff; border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; border: 1px solid #e0e0e0; display: block; }
+    #epikur-form .epi-card h2 { font-size: 15px; font-weight: 600; color: #385560; margin-bottom: 1rem; display: block; }
+    #epikur-form .epi-row2 { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 12px; margin-bottom: 12px; }
+    #epikur-form .epi-field { margin-bottom: 12px; display: block; }
+    #epikur-form label { font-size: 13px; color: #555; display: block !important; margin-bottom: 4px; font-weight: normal; }
+    #epikur-form input[type="text"],
+    #epikur-form input[type="date"],
+    #epikur-form input[type="time"] {
+      width: 100% !important;
+      padding: 9px 12px !important;
+      border: 1px solid #ddd !important;
+      border-radius: 8px !important;
+      font-size: 14px !important;
+      color: #1a1a1a !important;
+      background: #fff !important;
+      display: block !important;
+      height: auto !important;
+      line-height: normal !important;
+    }
+    #epikur-form input:focus { outline: none !important; border-color: #385560 !important; box-shadow: 0 0 0 3px rgba(56,85,96,0.1) !important; }
+    #epikur-form .epi-member-header { display: grid !important; grid-template-columns: 2fr 1fr 1fr 1fr 36px !important; gap: 8px; margin-bottom: 6px; align-items: center; }
+    #epikur-form .epi-member-header span { font-size: 12px; color: #888; display: block; }
+    #epikur-form .epi-member-row { display: grid !important; grid-template-columns: 2fr 1fr 1fr 1fr 36px !important; gap: 8px; align-items: center; margin-bottom: 8px; }
+    #epikur-form .epi-total { font-size: 13px; font-weight: 600; color: #385560; text-align: center; display: block; }
+    #epikur-form .epi-btn-remove { width: 36px !important; height: 36px !important; min-width: 36px; border-radius: 8px !important; border: 1px solid #ddd !important; background: #f9f9f9 !important; color: #999 !important; cursor: pointer; font-size: 18px; display: flex !important; align-items: center; justify-content: center; padding: 0 !important; flex-shrink: 0; }
+    #epikur-form .epi-btn-remove:hover { background: #ffeaea !important; border-color: #f5c6c6 !important; color: #c0392b !important; }
+    #epikur-form .epi-btn-add { width: 100% !important; background: none !important; border: 1.5px dashed #ccc !important; border-radius: 8px !important; padding: 10px !important; font-size: 13px !important; color: #888 !important; cursor: pointer; margin-top: 4px; display: block; }
+    #epikur-form .epi-btn-add:hover { background: #f5f5f5 !important; border-color: #385560 !important; color: #385560 !important; }
+    #epikur-form .epi-summary { background: #f0f4f6; border-radius: 10px; padding: 1rem; display: grid !important; grid-template-columns: repeat(3, 1fr) !important; gap: 8px; margin-top: 1rem; }
+    #epikur-form .epi-metric { text-align: center; display: block; }
+    #epikur-form .epi-metric-val { font-size: 20px; font-weight: 700; color: #385560; display: block; }
+    #epikur-form .epi-metric-lbl { font-size: 11px; color: #888; margin-top: 2px; display: block; }
+    #epikur-form .epi-btn-submit { width: 100% !important; background: #385560 !important; color: #fff !important; border: none !important; border-radius: 10px !important; padding: 14px !important; font-size: 15px !important; font-weight: 600 !important; cursor: pointer; margin-top: 1rem; display: block; }
+    #epikur-form .epi-btn-submit:hover { background: #2a3f4a !important; }
+    #epikur-form .epi-btn-submit:disabled { background: #aaa !important; cursor: not-allowed; }
+    #epikur-form .epi-msg { text-align: center; padding: 1.5rem; border-radius: 10px; font-size: 14px; margin-top: 1rem; display: none; }
+    #epikur-form .epi-msg.success { background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
+    #epikur-form .epi-msg.error { background: #fdecea; color: #c62828; border: 1px solid #f5c6c6; }
+    @media (max-width: 500px) {
+      #epikur-form .epi-row2 { grid-template-columns: 1fr !important; }
+      #epikur-form .epi-member-header,
+      #epikur-form .epi-member-row { grid-template-columns: 1.5fr 1fr 1fr 36px !important; }
+      #epikur-form .epi-member-header span:nth-child(4),
+      #epikur-form .epi-member-row .epi-total { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+<div id="epikur-form">
+  <header>
+    <h1>Epikur — Déclaration des heures</h1>
+    <p>Remplis les informations de ton équipe pour l'événement</p>
+  </header>
+
+  <div class="epi-card">
+    <h2>Informations de l'événement</h2>
+    <div class="epi-row2">
+      <div class="epi-field">
+        <label>Nom de l'événement *</label>
+        <input type="text" id="evt-name" placeholder="Ex: Festival Bruges">
+      </div>
+      <div class="epi-field">
+        <label>Date *</label>
+        <input type="date" id="evt-date">
+      </div>
+    </div>
+    <div class="epi-field">
+      <label>Ton nom (responsable) *</label>
+      <input type="text" id="evt-manager" placeholder="Prénom Nom">
+    </div>
+  </div>
+
+  <div class="epi-card">
+    <h2>Membres de l'équipe</h2>
+    <div class="epi-member-header">
+      <span>Nom du membre</span>
+      <span>Arrivée</span>
+      <span>Départ</span>
+      <span>Total</span>
+      <span></span>
+    </div>
+    <div id="members-list"></div>
+    <button class="epi-btn-add" onclick="addMember()">+ Ajouter un membre</button>
+
+    <div class="epi-summary">
+      <div class="epi-metric"><span class="epi-metric-val" id="s-members">0</span><span class="epi-metric-lbl">membres</span></div>
+      <div class="epi-metric"><span class="epi-metric-val" id="s-hours">0h</span><span class="epi-metric-lbl">total heures</span></div>
+      <div class="epi-metric"><span class="epi-metric-val" id="s-avg">—</span><span class="epi-metric-lbl">moy. par personne</span></div>
+    </div>
+  </div>
+
+  <button class="epi-btn-submit" id="btn-submit" onclick="submitForm()">Envoyer les heures</button>
+  <div class="epi-msg success" id="msg-success">✓ Heures envoyées avec succès ! Merci.</div>
+  <div class="epi-msg error" id="msg-error">Une erreur est survenue. Réessaie ou contacte Epikur.</div>
+</div>
+
+<script>
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby7dbEPoxfHo-WEFMvTHADy4NYe72NiRm0lFbuUsabdLCT4UZEqEa6uFt02bLvGJXTk2A/exec';
+  let memberCount = 0;
+
+  function addMember() {
+    memberCount++;
+    const id = memberCount;
+    const div = document.createElement('div');
+    div.className = 'epi-member-row';
+    div.id = 'member-' + id;
+    div.innerHTML = `
+      <input type="text" placeholder="Prénom Nom" id="name-${id}">
+      <input type="time" id="arr-${id}" onchange="calcTotal(${id})">
+      <input type="time" id="dep-${id}" onchange="calcTotal(${id})">
+      <span class="epi-total" id="tot-${id}">—</span>
+      <button class="epi-btn-remove" onclick="removeMember(${id})">×</button>
+    `;
+    document.getElementById('members-list').appendChild(div);
+    updateSummary();
+  }
+
+  function removeMember(id) {
+    const el = document.getElementById('member-' + id);
+    if (el) el.remove();
+    updateSummary();
+  }
+
+  function calcTotal(id) {
+    const arr = document.getElementById('arr-' + id).value;
+    const dep = document.getElementById('dep-' + id).value;
+    const cell = document.getElementById('tot-' + id);
+    if (arr && dep) {
+      const [ah, am] = arr.split(':').map(Number);
+      const [dh, dm] = dep.split(':').map(Number);
+      let mins = (dh * 60 + dm) - (ah * 60 + am);
+      if (mins < 0) mins += 24 * 60;
+      const h = Math.floor(mins / 60), m = mins % 60;
+      cell.textContent = m > 0 ? `${h}h${String(m).padStart(2,'0')}` : `${h}h`;
+    } else {
+      cell.textContent = '—';
+    }
+    updateSummary();
+  }
+
+  function updateSummary() {
+    const rows = document.querySelectorAll('.epi-member-row');
+    let totalMins = 0, count = 0;
+    rows.forEach(row => {
+      const id = row.id.replace('member-', '');
+      const arr = document.getElementById('arr-' + id)?.value;
+      const dep = document.getElementById('dep-' + id)?.value;
+      if (arr && dep) {
+        const [ah, am] = arr.split(':').map(Number);
+        const [dh, dm] = dep.split(':').map(Number);
+        let mins = (dh * 60 + dm) - (ah * 60 + am);
+        if (mins < 0) mins += 24 * 60;
+        totalMins += mins; count++;
+      }
+    });
+    document.getElementById('s-members').textContent = rows.length;
+    const th = Math.floor(totalMins / 60), tm = totalMins % 60;
+    document.getElementById('s-hours').textContent = totalMins > 0 ? (tm > 0 ? `${th}h${String(tm).padStart(2,'0')}` : `${th}h`) : '0h';
+    document.getElementById('s-avg').textContent = count > 0 ? `${Math.round(totalMins / count / 60 * 10) / 10}h` : '—';
+  }
+
+  function submitForm() {
+    const name = document.getElementById('evt-name').value.trim();
+    const date = document.getElementById('evt-date').value;
+    const manager = document.getElementById('evt-manager').value.trim();
+    if (!name || !date || !manager) { alert('Merci de remplir le nom de l\'événement, la date et ton nom.'); return; }
+
+    const members = [];
+    document.querySelectorAll('.epi-member-row').forEach(row => {
+      const id = row.id.replace('member-', '');
+      const n = document.getElementById('name-' + id)?.value.trim();
+      const arr = document.getElementById('arr-' + id)?.value;
+      const dep = document.getElementById('dep-' + id)?.value;
+      if (n) {
+        let total = '—';
+        if (arr && dep) {
+          const [ah, am] = arr.split(':').map(Number);
+          const [dh, dm] = dep.split(':').map(Number);
+          let mins = (dh * 60 + dm) - (ah * 60 + am);
+          if (mins < 0) mins += 24 * 60;
+          const h = Math.floor(mins / 60), m = mins % 60;
+          total = m > 0 ? `${h}h${String(m).padStart(2,'0')}` : `${h}h`;
+        }
+        members.push({ name: n, arrival: arr || '', departure: dep || '', total });
+      }
+    });
+
+    if (!members.length) { alert('Ajoute au moins un membre d\'équipe.'); return; }
+
+    const btn = document.getElementById('btn-submit');
+    btn.disabled = true;
+    btn.textContent = 'Envoi en cours...';
+
+    fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify({ eventName: name, eventDate: date, manager, members })
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.status === 'ok') {
+        document.getElementById('msg-success').style.display = 'block';
+        btn.style.display = 'none';
+        document.getElementById('evt-name').value = '';
+        document.getElementById('evt-date').value = '';
+        document.getElementById('evt-manager').value = '';
+        document.getElementById('members-list').innerHTML = '';
+        memberCount = 0;
+        updateSummary();
+      } else { throw new Error(data.message); }
+    })
+    .catch(() => {
+      document.getElementById('msg-error').style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Envoyer les heures';
+    });
+  }
+
+  addMember();
+</script>
+</body>
+</html>
