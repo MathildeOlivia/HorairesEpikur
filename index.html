@@ -18,16 +18,9 @@
     #epikur-form input[type="text"],
     #epikur-form input[type="date"],
     #epikur-form input[type="time"] {
-      width: 100% !important;
-      padding: 9px 12px !important;
-      border: 1px solid #ddd !important;
-      border-radius: 8px !important;
-      font-size: 14px !important;
-      color: #1a1a1a !important;
-      background: #fff !important;
-      display: block !important;
-      height: auto !important;
-      line-height: normal !important;
+      width: 100% !important; padding: 9px 12px !important; border: 1px solid #ddd !important;
+      border-radius: 8px !important; font-size: 14px !important; color: #1a1a1a !important;
+      background: #fff !important; display: block !important; height: auto !important; line-height: normal !important;
     }
     #epikur-form input:focus { outline: none !important; border-color: #385560 !important; box-shadow: 0 0 0 3px rgba(56,85,96,0.1) !important; }
     #epikur-form .epi-member-header { display: grid !important; grid-template-columns: 2fr 1fr 1fr 1fr 36px !important; gap: 8px; margin-bottom: 6px; align-items: center; }
@@ -50,10 +43,8 @@
     #epikur-form .epi-msg.error { background: #fdecea; color: #c62828; border: 1px solid #f5c6c6; }
     @media (max-width: 500px) {
       #epikur-form .epi-row2 { grid-template-columns: 1fr !important; }
-      #epikur-form .epi-member-header,
-      #epikur-form .epi-member-row { grid-template-columns: 1.5fr 1fr 1fr 36px !important; }
-      #epikur-form .epi-member-header span:nth-child(4),
-      #epikur-form .epi-member-row .epi-total { display: none !important; }
+      #epikur-form .epi-member-header, #epikur-form .epi-member-row { grid-template-columns: 1.5fr 1fr 1fr 36px !important; }
+      #epikur-form .epi-member-header span:nth-child(4), #epikur-form .epi-member-row .epi-total { display: none !important; }
     }
   </style>
 </head>
@@ -93,7 +84,6 @@
     </div>
     <div id="members-list"></div>
     <button class="epi-btn-add" onclick="addMember()">+ Ajouter un membre</button>
-
     <div class="epi-summary">
       <div class="epi-metric"><span class="epi-metric-val" id="s-members">0</span><span class="epi-metric-lbl">membres</span></div>
       <div class="epi-metric"><span class="epi-metric-val" id="s-hours">0h</span><span class="epi-metric-lbl">total heures</span></div>
@@ -144,9 +134,7 @@
       if (mins < 0) mins += 24 * 60;
       const h = Math.floor(mins / 60), m = mins % 60;
       cell.textContent = m > 0 ? `${h}h${String(m).padStart(2,'0')}` : `${h}h`;
-    } else {
-      cell.textContent = '—';
-    }
+    } else { cell.textContent = '—'; }
     updateSummary();
   }
 
@@ -203,22 +191,28 @@
     btn.disabled = true;
     btn.textContent = 'Envoi en cours...';
 
+    // Envoi via no-cors pour contourner le CORS de Google Apps Script
+    const formData = new FormData();
+    formData.append('eventName', name);
+    formData.append('eventDate', date);
+    formData.append('manager', manager);
+    formData.append('members', JSON.stringify(members));
+
     fetch(SCRIPT_URL, {
       method: 'POST',
-      body: JSON.stringify({ eventName: name, eventDate: date, manager, members })
+      mode: 'no-cors',
+      body: formData
     })
-    .then(r => r.json())
-    .then(data => {
-      if (data.status === 'ok') {
-        document.getElementById('msg-success').style.display = 'block';
-        btn.style.display = 'none';
-        document.getElementById('evt-name').value = '';
-        document.getElementById('evt-date').value = '';
-        document.getElementById('evt-manager').value = '';
-        document.getElementById('members-list').innerHTML = '';
-        memberCount = 0;
-        updateSummary();
-      } else { throw new Error(data.message); }
+    .then(() => {
+      document.getElementById('msg-success').style.display = 'block';
+      btn.style.display = 'none';
+      document.getElementById('evt-name').value = '';
+      document.getElementById('evt-date').value = '';
+      document.getElementById('evt-manager').value = '';
+      document.getElementById('members-list').innerHTML = '';
+      memberCount = 0;
+      addMember();
+      updateSummary();
     })
     .catch(() => {
       document.getElementById('msg-error').style.display = 'block';
